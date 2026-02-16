@@ -18,12 +18,29 @@ import { register as templates } from "./templates.js";
 import { register as bookmarks } from "./bookmarks.js";
 import { register as plugins } from "./plugins.js";
 import { register as workspace } from "./workspace.js";
+import { register as write } from "./write.js";
 import { register as commands } from "./commands.js";
 
 const registrations = [
-  vault, files, read, create, edit, manageFile, search, tags,
-  properties, daily, tasks, links, outline, templates, bookmarks,
-  plugins, workspace, commands,
+  vault,
+  files,
+  read,
+  create,
+  write,
+  edit,
+  manageFile,
+  search,
+  tags,
+  properties,
+  daily,
+  tasks,
+  links,
+  outline,
+  templates,
+  bookmarks,
+  plugins,
+  workspace,
+  commands,
 ];
 
 export function registerAllTools(server: McpServer, cli: ObsidianCLI): void {
