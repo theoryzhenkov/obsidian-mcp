@@ -1,6 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import type { ObsidianCLI } from "../cli.js";
+import { cliResponse, errorResponse } from "../helpers.js";
 
 export function register(server: McpServer, cli: ObsidianCLI): void {
   server.tool(
@@ -16,6 +17,10 @@ export function register(server: McpServer, cli: ObsidianCLI): void {
         .describe("Workspace name. Required for 'open' and 'save' actions"),
     },
     async ({ action, name }) => {
+      if (action !== "list" && !name) {
+        return errorResponse(`'name' is required for '${action}' action`);
+      }
+
       let result;
 
       switch (action) {
@@ -30,11 +35,7 @@ export function register(server: McpServer, cli: ObsidianCLI): void {
           break;
       }
 
-      if (result.exitCode !== 0) {
-        return { content: [{ type: "text" as const, text: result.stderr || result.stdout }], isError: true };
-      }
-
-      return { content: [{ type: "text" as const, text: result.stdout }] };
+      return cliResponse(result);
     },
   );
 }

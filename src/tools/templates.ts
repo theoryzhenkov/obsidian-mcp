@@ -1,6 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import type { ObsidianCLI } from "../cli.js";
+import { cliResponse, errorResponse } from "../helpers.js";
 
 export function register(server: McpServer, cli: ObsidianCLI): void {
   server.tool(
@@ -9,7 +10,9 @@ export function register(server: McpServer, cli: ObsidianCLI): void {
     {
       action: z
         .enum(["list", "read"])
-        .describe("'list' returns all available templates; 'read' returns the content of a specific template"),
+        .describe(
+          "'list' returns all available templates; 'read' returns the content of a specific template",
+        ),
       name: z
         .string()
         .optional()
@@ -23,15 +26,13 @@ export function register(server: McpServer, cli: ObsidianCLI): void {
           result = await cli.exec("templates");
           break;
         case "read":
-          result = await cli.exec("template:read", { name: name! });
+          if (!name)
+            return errorResponse("'name' is required for 'read' action");
+          result = await cli.exec("template:read", { name });
           break;
       }
 
-      if (result.exitCode !== 0) {
-        return { content: [{ type: "text" as const, text: result.stderr || result.stdout }], isError: true };
-      }
-
-      return { content: [{ type: "text" as const, text: result.stdout }] };
+      return cliResponse(result);
     },
   );
 }

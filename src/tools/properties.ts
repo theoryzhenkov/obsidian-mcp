@@ -1,6 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import type { ObsidianCLI } from "../cli.js";
+import { cliResponse, errorResponse, buildFileOrPath } from "../helpers.js";
 
 export function register(server: McpServer, cli: ObsidianCLI): void {
   server.tool(
@@ -10,21 +11,27 @@ export function register(server: McpServer, cli: ObsidianCLI): void {
       action: z
         .enum(["list", "read", "set", "remove"])
         .describe("The property operation to perform"),
-      file: z.string().optional().describe("Vault-relative file path to target"),
-      path: z.string().optional().describe("Vault-relative folder path to scope the operation"),
-      property: z.string().optional().describe("Property name (required for read, set, remove)"),
-      value: z.string().optional().describe("Property value to set (required for 'set' action)"),
+      file: z
+        .string()
+        .optional()
+        .describe("Vault-relative file path to target"),
+      path: z
+        .string()
+        .optional()
+        .describe("Vault-relative folder path to scope the operation"),
+      property: z
+        .string()
+        .optional()
+        .describe("Property name (required for read, set, remove)"),
+      value: z
+        .string()
+        .optional()
+        .describe("Property value to set (required for 'set' action)"),
     },
     async ({ action, file, path, property, value }) => {
-      const optionalFileOrPath: Record<string, string> = {};
-      if (file) {
-        optionalFileOrPath.file = file;
-      }
-      if (path) {
-        optionalFileOrPath.path = path;
-      }
-
-      const params = Object.keys(optionalFileOrPath).length > 0 ? optionalFileOrPath : undefined;
+      const fileOrPath = buildFileOrPath(file, path);
+      const params =
+        Object.keys(fileOrPath).length > 0 ? fileOrPath : undefined;
 
       let result;
 
@@ -33,21 +40,32 @@ export function register(server: McpServer, cli: ObsidianCLI): void {
           result = await cli.exec("properties", params);
           break;
         case "read":
-          result = await cli.exec("property:read", { property: property!, ...optionalFileOrPath });
+          if (!property)
+            return errorResponse("'property' is required for 'read' action");
+          result = await cli.exec("property:read", { property, ...fileOrPath });
           break;
         case "set":
-          result = await cli.exec("property:set", { property: property!, value: value!, ...optionalFileOrPath });
+          if (!property)
+            return errorResponse("'property' is required for 'set' action");
+          if (!value)
+            return errorResponse("'value' is required for 'set' action");
+          result = await cli.exec("property:set", {
+            property,
+            value,
+            ...fileOrPath,
+          });
           break;
         case "remove":
-          result = await cli.exec("property:remove", { property: property!, ...optionalFileOrPath });
+          if (!property)
+            return errorResponse("'property' is required for 'remove' action");
+          result = await cli.exec("property:remove", {
+            property,
+            ...fileOrPath,
+          });
           break;
       }
 
-      if (result.exitCode !== 0) {
-        return { content: [{ type: "text" as const, text: result.stderr || result.stdout }], isError: true };
-      }
-
-      return { content: [{ type: "text" as const, text: result.stdout }] };
+      return cliResponse(result);
     },
   );
 }

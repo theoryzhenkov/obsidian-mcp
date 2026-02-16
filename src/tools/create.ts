@@ -1,17 +1,23 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import type { ObsidianCLI } from "../cli.js";
+import { cliResponse } from "../helpers.js";
 
 export function register(server: McpServer, cli: ObsidianCLI): void {
   server.tool(
     "obsidian_create",
     "Create a new file in the Obsidian vault. Optionally provide content, a template, or overwrite an existing file.",
     {
-      name: z.string().optional().describe("Name for the new file (e.g. 'My Note')"),
+      name: z
+        .string()
+        .optional()
+        .describe("Name for the new file (e.g. 'My Note')"),
       path: z
         .string()
         .optional()
-        .describe("Path for the new file relative to vault root (e.g. 'folder/My Note.md')"),
+        .describe(
+          "Path for the new file relative to vault root (e.g. 'folder/My Note.md')",
+        ),
       content: z.string().optional().describe("Initial content for the file"),
       template: z
         .string()
@@ -33,12 +39,7 @@ export function register(server: McpServer, cli: ObsidianCLI): void {
       if (overwrite) flags.push("--overwrite");
 
       const result = await cli.exec("create", params, flags);
-
-      if (result.exitCode !== 0) {
-        return { content: [{ type: "text", text: result.stderr || result.stdout }], isError: true };
-      }
-
-      return { content: [{ type: "text", text: result.stdout }] };
+      return cliResponse(result);
     },
   );
 }

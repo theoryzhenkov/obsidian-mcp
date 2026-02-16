@@ -1,6 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import type { ObsidianCLI } from "../cli.js";
+import { cliResponse } from "../helpers.js";
 
 export function register(server: McpServer, cli: ObsidianCLI): void {
   server.tool(
@@ -13,31 +14,23 @@ export function register(server: McpServer, cli: ObsidianCLI): void {
       path: z
         .string()
         .optional()
-        .describe("Vault-relative path. Required for 'file_info' and 'folder_info'; optional filter for list operations"),
+        .describe(
+          "Vault-relative path. Required for 'file_info' and 'folder_info'; optional filter for list operations",
+        ),
     },
     async ({ action, path }) => {
-      let result;
+      const commandMap = {
+        list_files: "files",
+        list_folders: "folders",
+        file_info: "file",
+        folder_info: "folder",
+      } as const;
 
-      switch (action) {
-        case "list_files":
-          result = await cli.exec("files", path ? { path } : undefined);
-          break;
-        case "list_folders":
-          result = await cli.exec("folders", path ? { path } : undefined);
-          break;
-        case "file_info":
-          result = await cli.exec("file", path ? { path } : undefined);
-          break;
-        case "folder_info":
-          result = await cli.exec("folder", path ? { path } : undefined);
-          break;
-      }
-
-      if (result.exitCode !== 0) {
-        return { content: [{ type: "text" as const, text: result.stderr || result.stdout }], isError: true };
-      }
-
-      return { content: [{ type: "text" as const, text: result.stdout }] };
+      const result = await cli.exec(
+        commandMap[action],
+        path ? { path } : undefined,
+      );
+      return cliResponse(result);
     },
   );
 }

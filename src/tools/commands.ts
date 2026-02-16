@@ -1,6 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import type { ObsidianCLI } from "../cli.js";
+import { cliResponse } from "../helpers.js";
 
 export function register(server: McpServer, cli: ObsidianCLI): void {
   server.tool(
@@ -9,16 +10,13 @@ export function register(server: McpServer, cli: ObsidianCLI): void {
     {
       id: z
         .string()
-        .describe("The command ID to execute (e.g. 'editor:toggle-bold', 'app:reload')"),
+        .describe(
+          "The command ID to execute (e.g. 'editor:toggle-bold', 'app:reload')",
+        ),
     },
     async ({ id }) => {
       const result = await cli.exec("command", { id });
-
-      if (result.exitCode !== 0) {
-        return { content: [{ type: "text" as const, text: result.stderr || result.stdout }], isError: true };
-      }
-
-      return { content: [{ type: "text" as const, text: result.stdout }] };
+      return cliResponse(result);
     },
   );
 }

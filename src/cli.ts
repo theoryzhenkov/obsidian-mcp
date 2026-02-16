@@ -67,6 +67,12 @@ export class ObsidianCLI {
       );
     }
 
-    return JSON.parse(result.stdout) as T;
+    try {
+      return JSON.parse(result.stdout) as T;
+    } catch {
+      throw new Error(
+        `Failed to parse JSON from CLI command '${command}': ${result.stdout.slice(0, 500)}`,
+      );
+    }
   }
 }

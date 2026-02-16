@@ -1,6 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import type { ObsidianCLI } from "../cli.js";
+import { cliResponse, errorResponse } from "../helpers.js";
 
 export function register(server: McpServer, cli: ObsidianCLI): void {
   server.tool(
@@ -16,6 +17,10 @@ export function register(server: McpServer, cli: ObsidianCLI): void {
         .describe("Plugin ID. Required for all actions except 'list'"),
     },
     async ({ action, plugin }) => {
+      if (action !== "list" && !plugin) {
+        return errorResponse(`'plugin' is required for '${action}' action`);
+      }
+
       let result;
 
       switch (action) {
@@ -39,11 +44,7 @@ export function register(server: McpServer, cli: ObsidianCLI): void {
           break;
       }
 
-      if (result.exitCode !== 0) {
-        return { content: [{ type: "text" as const, text: result.stderr || result.stdout }], isError: true };
-      }
-
-      return { content: [{ type: "text" as const, text: result.stdout }] };
+      return cliResponse(result);
     },
   );
 }
