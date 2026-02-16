@@ -1,12 +1,33 @@
 {
   "name": "obsidian-mcp",
   "version": "0.1.0",
-  "description": "MCP server wrapping the Obsidian CLI",
+  "description": "MCP server providing AI agents with read/write access to Obsidian vaults via the official CLI",
   "type": "module",
   "main": "src/index.ts",
+  "author": "Fedor Ryzhenkov",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/obsidian-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/obsidian-mcp/issues"
+  },
+  "homepage": "https://github.com/yourusername/obsidian-mcp#readme",
+  "keywords": [
+    "obsidian",
+    "mcp",
+    "model-context-protocol",
+    "ai",
+    "cli",
+    "notes",
+    "knowledge-management",
+    "claude"
+  ],
   "scripts": {
     "start": "bun run src/index.ts",
     "build": "bun build src/index.ts --outdir dist --target bun",
+    "typecheck": "bunx tsc --noEmit",
     "inspect": "bunx @modelcontextprotocol/inspector bun run src/index.ts"
   },
   "dependencies": {
@@ -16,5 +37,8 @@
   "devDependencies": {
     "@types/bun": "^1.2.0",
     "typescript": "^5.7.0"
+  },
+  "engines": {
+    "bun": ">=1.0.0"
   }
 }
