@@ -1,0 +1,116 @@
+{
+  "name": "obsidian-mcp",
+  "version": "0.1.0",
+  "description": "MCP server providing AI agents with read/write access to Obsidian vaults via the official CLI",
+  "author": "Fedor Ryzhenkov",
+  "homepage": "https://github.com/theoryzhenkov/obsidian-mcp",
+  "license": "MIT",
+  "runtime": "bun",
+  "installation": {
+    "method": "git",
+    "repository": "https://github.com/theoryzhenkov/obsidian-mcp.git"
+  },
+  "command": {
+    "type": "stdio",
+    "command": "bun",
+    "args": ["run", "src/index.ts"]
+  },
+  "config": {
+    "environment": {
+      "OBSIDIAN_VAULT": {
+        "description": "Default vault name (optional)",
+        "required": false
+      },
+      "OBSIDIAN_CLI_PATH": {
+        "description": "Path to obsidian binary",
+        "required": false,
+        "default": "obsidian"
+      }
+    }
+  },
+  "tools": [
+    {
+      "name": "obsidian_vault",
+      "description": "Get vault info or list all vaults"
+    },
+    {
+      "name": "obsidian_files",
+      "description": "List files/folders or get info on specific items"
+    },
+    {
+      "name": "obsidian_read",
+      "description": "Read file content"
+    },
+    {
+      "name": "obsidian_write",
+      "description": "Write or replace full file content"
+    },
+    {
+      "name": "obsidian_create",
+      "description": "Create new file with optional template"
+    },
+    {
+      "name": "obsidian_edit",
+      "description": "Append or prepend content"
+    },
+    {
+      "name": "obsidian_manage_file",
+      "description": "Move or delete files"
+    },
+    {
+      "name": "obsidian_search",
+      "description": "Full-text search with filters"
+    },
+    {
+      "name": "obsidian_tags",
+      "description": "List tags or find notes by tag"
+    },
+    {
+      "name": "obsidian_properties",
+      "description": "CRUD operations on frontmatter properties"
+    },
+    {
+      "name": "obsidian_daily",
+      "description": "Read or modify today's daily note"
+    },
+    {
+      "name": "obsidian_tasks",
+      "description": "List or update tasks"
+    },
+    {
+      "name": "obsidian_links",
+      "description": "Analyze backlinks, outgoing links, orphans, unresolved links, deadends"
+    },
+    {
+      "name": "obsidian_outline",
+      "description": "Get heading structure of a note"
+    },
+    {
+      "name": "obsidian_templates",
+      "description": "List or read templates"
+    },
+    {
+      "name": "obsidian_bookmarks",
+      "description": "List bookmarked items"
+    },
+    {
+      "name": "obsidian_plugins",
+      "description": "Manage community plugins"
+    },
+    {
+      "name": "obsidian_workspace",
+      "description": "Manage workspace layouts"
+    },
+    {
+      "name": "obsidian_command",
+      "description": "Execute arbitrary Obsidian commands"
+    }
+  ],
+  "resources": [
+    {
+      "name": "vault-file",
+      "description": "Read a file from the Obsidian vault by path",
+      "uriTemplate": "obsidian://vault/{path}"
+    }
+  ]
+}
